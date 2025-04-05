@@ -33,7 +33,7 @@
 		EBDEEDC82D9DEF19006CEDC9 /* Exceptions for "HackerNewsReader" folder in "HackerNewsReader" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Resources/Info.plist,
+				Info.plist,
 			);
 			target = EBDEED9F2D9DEF17006CEDC9 /* HackerNewsReader */;
 		};
