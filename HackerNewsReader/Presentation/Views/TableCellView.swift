@@ -99,7 +99,7 @@ extension TableCellView {
     func configure(with story: Story) {
         titleLabel.text = story.title
         urlLabel.text = extractDomain(from: story.url)
-        pointsLabel.text = "points: 0"
+        pointsLabel.text = "points: \(story.score ?? 0)"
         authorLabel.text = "by \(story.by ?? "Anonymous")"
         
         let timestamp: TimeInterval = TimeInterval(story.time)

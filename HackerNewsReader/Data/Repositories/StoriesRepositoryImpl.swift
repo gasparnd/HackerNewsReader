@@ -20,31 +20,39 @@ final class StoriesRepositoryImpl: StoriesRepository {
         return story
     }
     
+    private var cachedStoryIDs: [Int] = []
+    private var currentPage = 0
+    private let pageSize = 20
+
     func getRecentStories() async throws -> [Story] {
-        let storieIds: [Int] = try await apiClient.request(endpoint: .recentStories)
-        if storieIds.isEmpty {
-            return []
+        if cachedStoryIDs.isEmpty {
+            cachedStoryIDs = try await apiClient.request(endpoint: .recentStories)
         }
-        
-        let firstIDs = Array(storieIds.prefix(20))
-        
+
+        let start = currentPage * pageSize
+        let end = min(start + pageSize, cachedStoryIDs.count)
+        guard start < end else { return [] }
+
+        let pageIDs = Array(cachedStoryIDs[start..<end])
+        currentPage += 1
+
         var stories: [Story] = []
-        
-        // Llamadas en paralelo
+
         try await withThrowingTaskGroup(of: Story.self) { group in
-            for id in firstIDs {
+            for id in pageIDs {
                 group.addTask {
                     try await self.getStoryDetails(id: id)
                 }
             }
-            
-            for try await post in group {
-                stories.append(post)
+
+            for try await story in group {
+                stories.append(story)
             }
         }
-        
+
         return stories.sorted { $0.time > $1.time }
     }
+    
     
     func getJobList() async throws -> [Story] {
         let jobIds: [Int] = try await apiClient.request(endpoint: .jobs)

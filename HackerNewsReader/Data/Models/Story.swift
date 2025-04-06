@@ -12,5 +12,6 @@ struct Story: Codable {
     let title: String?
     let id: Int
     let time: Int
+    let score: Int?
     let url: String?
 }
