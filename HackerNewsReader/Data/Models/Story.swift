@@ -8,12 +8,9 @@
 import Foundation
 
 struct Story: Codable {
-    let by: String
-    let dead: Bool
+    let by: String?
+    let title: String?
     let id: Int
-    let descendants: Int
-    let kinds: [Id]
-    let score: Int
     let time: Int
-    let url: String
+    let url: String?
 }

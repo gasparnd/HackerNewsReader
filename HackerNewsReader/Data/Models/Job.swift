@@ -9,6 +9,7 @@ import Foundation
 
 struct Job: Codable {
     let by: String
+    let title: String
     let dead: Bool
     let id: Int
     let descendants: Int

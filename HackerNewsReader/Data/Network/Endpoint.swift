@@ -14,7 +14,7 @@ enum HTTPMethod: String {
 enum Endpoint {
     case recentStories
     case jobs
-    case itemDetails(id: Int)
+    case storyDetails(id: Int)
     
     var url: URL {
         let baseURL = "https://hacker-news.firebaseio.com/v0"
@@ -24,7 +24,7 @@ enum Endpoint {
             return URL(string: "\(baseURL)/newstories.json")!
         case .jobs:
             return URL(string: "\(baseURL)/jobstories.json")!
-        case .itemDetails(let id):
+        case .storyDetails(let id):
             return URL(string: "\(baseURL)/item/\(id).json")!
         }
     }
