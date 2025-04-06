@@ -23,33 +23,33 @@ final class StoriesRepositoryImpl: StoriesRepository {
     private var cachedStoryIDs: [Int] = []
     private var currentPage = 0
     private let pageSize = 20
-
+    
     func getRecentStories() async throws -> [Story] {
         if cachedStoryIDs.isEmpty {
             cachedStoryIDs = try await apiClient.request(endpoint: .recentStories)
         }
-
+        
         let start = currentPage * pageSize
         let end = min(start + pageSize, cachedStoryIDs.count)
         guard start < end else { return [] }
-
+        
         let pageIDs = Array(cachedStoryIDs[start..<end])
         currentPage += 1
-
+        
         var stories: [Story] = []
-
+        
         try await withThrowingTaskGroup(of: Story.self) { group in
             for id in pageIDs {
                 group.addTask {
                     try await self.getStoryDetails(id: id)
                 }
             }
-
+            
             for try await story in group {
                 stories.append(story)
             }
         }
-
+        
         return stories.sorted { $0.time > $1.time }
     }
     
