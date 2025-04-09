@@ -8,7 +8,7 @@
 import Foundation
 
 protocol GetStoriesUseCaseProtocol {
-    func getStories() async throws -> [Story]
+    func getStories(type: StoryType) async throws -> [Story]
 }
 
 final class GetStoriesUseCase: GetStoriesUseCaseProtocol {
@@ -18,9 +18,15 @@ final class GetStoriesUseCase: GetStoriesUseCaseProtocol {
         self.repository = repository
     }
     
-    func getStories() async throws -> [Story] {
-        let data = try await repository.getRecentStories()
-        return data
+    func getStories(type: StoryType) async throws -> [Story] {
+        switch type {
+        case .latest:
+            let data = try await repository.getRecentStories()
+            return data
+        case .trending:
+            let data = try await repository.getTrendingStories()
+            return data
+        }
     }
     
 }

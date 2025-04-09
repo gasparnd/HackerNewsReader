@@ -14,22 +14,40 @@ class ViewController: UIViewController, UITableViewDelegate {
     private  var footerView: LoadingFooterView!
     private var isLoading = false
     
+    private let filterButton: UIButton = {
+        var config = UIButton.Configuration.plain()
+        config.title = "Sort"
+        config.image = UIImage(systemName: "arrow.up.arrow.down")
+        config.imagePlacement = .leading
+        config.imagePadding = 6
+        
+        let button = UIButton(configuration: config)
+        button.showsMenuAsPrimaryAction = true
+        return button
+    }()
+    
+    private var selectedFilter: StoryType = .latest {
+        didSet {
+            updateMenu()
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .red
-        loadInitialStories()
+        loadInitialStories(type: .latest)
         tableViewSetup()
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: filterButton)
+        updateMenu()
     }
     
-    func loadInitialStories() {
-        if stories.count > 0 { return }
-        
+    func loadInitialStories(type: StoryType) {
         Task {
             do {
-                let data = try await getStoriesUseCase.getStories()
+                let data = try await getStoriesUseCase.getStories(type: type)
                 await MainActor.run {
                     print("data loaded")
-                    self.stories.append(contentsOf: data)
+                    self.stories = data
                     print(self.stories.count)
                     isLoading = false
                     self.tableView.reloadData()
@@ -46,7 +64,7 @@ class ViewController: UIViewController, UITableViewDelegate {
         isLoading = true
         Task {
             do {
-                let data = try await getStoriesUseCase.getStories()
+                let data = try await getStoriesUseCase.getStories(type: selectedFilter)
                 await MainActor.run {
                     print("data loaded")
                     self.stories.append(contentsOf: data)
@@ -59,6 +77,20 @@ class ViewController: UIViewController, UITableViewDelegate {
                 print("error, ", error.localizedDescription)
             }
         }
+    }
+    
+    private func updateMenu() {
+        let actions = StoryType.allCases.map { option in
+            UIAction(title: option.rawValue,
+                     state: option == selectedFilter ? .on : .off,
+                     handler: { [weak self] _ in
+                self?.selectedFilter = option
+                self?.title = "\(option.rawValue) Stories"
+                self?.loadInitialStories(type: option)
+            })
+        }
+        
+        filterButton.menu = UIMenu(title: "", children: actions)
     }
     
 }

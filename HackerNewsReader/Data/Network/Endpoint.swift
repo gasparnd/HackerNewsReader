@@ -13,6 +13,7 @@ enum HTTPMethod: String {
 
 enum Endpoint {
     case recentStories
+    case topStories
     case jobs
     case storyDetails(id: Int)
     
@@ -22,6 +23,8 @@ enum Endpoint {
         switch self {
         case .recentStories:
             return URL(string: "\(baseURL)/newstories.json")!
+        case .topStories:
+            return URL(string: "\(baseURL)/topstories.json")!
         case .jobs:
             return URL(string: "\(baseURL)/jobstories.json")!
         case .storyDetails(let id):

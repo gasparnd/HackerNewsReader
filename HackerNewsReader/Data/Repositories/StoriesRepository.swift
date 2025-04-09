@@ -9,6 +9,7 @@ import Foundation
 
 protocol StoriesRepository {
     func getRecentStories() async throws -> [Story]
+    func getTrendingStories() async throws -> [Story]
     func getJobList() async throws -> [Story]
     func getStoryDetails(id: Int) async throws -> Story
 }
