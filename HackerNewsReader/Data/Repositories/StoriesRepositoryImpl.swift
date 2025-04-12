@@ -16,6 +16,10 @@ final class StoriesRepositoryImpl: StoriesRepository {
     private var currentPage = 0
     private let pageSize = 20
     
+    private var cachedJobIDs: [Int] = []
+    private var jobsCurrentPage = 0
+    private let jobsPageSize = 20
+    
     init(apiClient: APIClient = APIClient()) {
         self.apiClient = apiClient
     }
@@ -87,8 +91,31 @@ final class StoriesRepositoryImpl: StoriesRepository {
     
     
     func getJobList() async throws -> [Story] {
-        let jobIds: [Int] = try await apiClient.request(endpoint: .jobs)
-        return []
+        if cachedJobIDs.isEmpty {
+            cachedJobIDs = try await apiClient.request(endpoint: .jobs)
+        }
+        let start = jobsCurrentPage * jobsPageSize
+        let end = min(start + jobsPageSize, cachedJobIDs.count)
+        guard start < end else { return [] }
+        
+        let pageIDs = Array(cachedJobIDs[start..<end])
+        jobsCurrentPage += 1
+        
+        var jobs: [Story] = []
+        
+        try await withThrowingTaskGroup(of: Story.self) { group in
+            for id in pageIDs {
+                group.addTask {
+                    try await self.getStoryDetails(id: id)
+                }
+            }
+            
+            for try await story in group {
+                jobs.append(story)
+            }
+        }
+        
+        return jobs.sorted { $0.time > $1.time }
     }
     
 }

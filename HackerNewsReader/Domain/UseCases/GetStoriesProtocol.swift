@@ -9,6 +9,7 @@ import Foundation
 
 protocol GetStoriesUseCaseProtocol {
     func getStories(type: StoryType) async throws -> [Story]
+    func getJobs() async throws -> [Story]
 }
 
 final class GetStoriesUseCase: GetStoriesUseCaseProtocol {
@@ -28,5 +29,10 @@ final class GetStoriesUseCase: GetStoriesUseCaseProtocol {
             return data
         }
     }
+    
+    func getJobs() async throws -> [Story] {
+        let data = try await repository.getJobList()
+        return data
+    }  
     
 }

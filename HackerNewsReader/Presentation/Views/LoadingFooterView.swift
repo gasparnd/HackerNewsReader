@@ -38,7 +38,7 @@ final class LoadingFooterView: UIView {
             activityIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
             activityIndicator.topAnchor.constraint(equalTo: topAnchor, constant: 10),
             messageLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            messageLabel.topAnchor.constraint(equalTo: activityIndicator.bottomAnchor, constant: 10)
+            messageLabel.topAnchor.constraint(equalTo: activityIndicator.bottomAnchor, constant: 10),
         ])
     }
     
@@ -49,7 +49,10 @@ final class LoadingFooterView: UIView {
         messageLabel.isHidden = true
     }
     
-    func showNoMoreData() {
+    func showNoMoreData(message: String?) {
+        if let message = message {
+            messageLabel.text = message
+        }
         activityIndicator.stopAnimating()
         messageLabel.isHidden = false
     }
