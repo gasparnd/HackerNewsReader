@@ -9,6 +9,7 @@ import WebKit
 import UIKit
 
 final class WebViewController: UIViewController {
+    private let useCases = SaveStoryUseCase()
     
     private var webView: WKWebView!
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
@@ -77,7 +78,7 @@ extension WebViewController: WKNavigationDelegate {
 
 extension WebViewController {
     @objc func didTapSave() {
-        
+        useCases.saveStory(story: story)
     }
     
     @objc func didTapShare() {

@@ -11,7 +11,7 @@ class ViewController: UIViewController, UITableViewDelegate {
     private let getStoriesUseCase = GetStoriesUseCase()
     private var stories: [Story] = []
     private let tableView = UITableView()
-    private  var footerView: LoadingFooterView!
+    private var footerView: LoadingFooterView!
     private var isLoading = false
     
     private let filterButton: UIButton = {
@@ -34,7 +34,7 @@ class ViewController: UIViewController, UITableViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .red
+        title = "Latest stories"
         loadInitialStories(type: .latest)
         tableViewSetup()
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: filterButton)

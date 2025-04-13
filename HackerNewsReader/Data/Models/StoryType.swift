@@ -8,8 +8,8 @@
 import Foundation
 
 enum StoryType: String, CaseIterable {
-    case trending = "Trending"
     case latest = "Latest"
+    case trending = "Trending"
     
     var endpointName: Endpoint {
         switch self {

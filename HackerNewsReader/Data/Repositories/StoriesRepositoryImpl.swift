@@ -10,6 +10,7 @@ import Foundation
 final class StoriesRepositoryImpl: StoriesRepository {
     
     let apiClient: APIClient
+    let dataBaseService: DataBaseServiceProtocol
     
     private var cachedRecentStoryIDs: [Int] = []
     private var cachedTrendingStoryIDs: [Int] = []
@@ -20,8 +21,9 @@ final class StoriesRepositoryImpl: StoriesRepository {
     private var jobsCurrentPage = 0
     private let jobsPageSize = 20
     
-    init(apiClient: APIClient = APIClient()) {
+    init(apiClient: APIClient = APIClient(), dataBaseService: DataBaseServiceProtocol = DataBaseService()) {
         self.apiClient = apiClient
+        self.dataBaseService = dataBaseService
     }
     
     func getStoryDetails(id: Int) async throws -> Story {
@@ -116,6 +118,15 @@ final class StoriesRepositoryImpl: StoriesRepository {
         }
         
         return jobs.sorted { $0.time > $1.time }
+    }
+    
+    func getSavedStories() -> [Story] {
+        let savedStories = dataBaseService.fetchSavedStories()
+        return savedStories
+    }
+    
+    func saveStory(_ story: Story) {
+        return dataBaseService.saveStory(story: story)
     }
     
 }

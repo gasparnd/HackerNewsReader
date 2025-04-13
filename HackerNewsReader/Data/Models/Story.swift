@@ -10,8 +10,8 @@ import Foundation
 struct Story: Codable {
     let by: String?
     let title: String?
-    let id: Int
-    let time: Int
-    let score: Int?
+    let id: Int32
+    let time: Int64
+    let score: Int32?
     let url: String?
 }

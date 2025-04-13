@@ -12,4 +12,6 @@ protocol StoriesRepository {
     func getTrendingStories() async throws -> [Story]
     func getJobList() async throws -> [Story]
     func getStoryDetails(id: Int) async throws -> Story
+    func getSavedStories() -> [Story]
+    func saveStory(_ story: Story) -> Void
 }
