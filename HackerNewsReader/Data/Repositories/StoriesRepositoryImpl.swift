@@ -31,10 +31,10 @@ final class StoriesRepositoryImpl: StoriesRepository {
         return story
     }
     
-    func getRecentStories() async throws -> [Story] {
-        if cachedRecentStoryIDs.isEmpty {
-            cachedTrendingStoryIDs = []
+    func getRecentStories(isRefreshing: Bool = false) async throws -> [Story] {
+        if cachedRecentStoryIDs.isEmpty || isRefreshing {
             cachedRecentStoryIDs = try await apiClient.request(endpoint: .recentStories)
+            currentPage = 0
         }
         
         let start = currentPage * pageSize
@@ -61,9 +61,10 @@ final class StoriesRepositoryImpl: StoriesRepository {
         return stories.sorted { $0.time > $1.time }
     }
     
-    func getTrendingStories() async throws -> [Story] {
-        if cachedTrendingStoryIDs.isEmpty {
+    func getTrendingStories(isRefreshing: Bool = false) async throws -> [Story] {
+        if cachedTrendingStoryIDs.isEmpty || isRefreshing  {
             cachedRecentStoryIDs = []
+            currentPage = 0
             cachedTrendingStoryIDs = try await apiClient.request(endpoint: .topStories)
         }
         
@@ -92,10 +93,12 @@ final class StoriesRepositoryImpl: StoriesRepository {
     }
     
     
-    func getJobList() async throws -> [Story] {
-        if cachedJobIDs.isEmpty {
+    func getJobList(isRefreshing: Bool = false) async throws -> [Story] {
+        if cachedJobIDs.isEmpty || isRefreshing  {
             cachedJobIDs = try await apiClient.request(endpoint: .jobs)
+            jobsCurrentPage = 0
         }
+        
         let start = jobsCurrentPage * jobsPageSize
         let end = min(start + jobsPageSize, cachedJobIDs.count)
         guard start < end else { return [] }
@@ -122,7 +125,7 @@ final class StoriesRepositoryImpl: StoriesRepository {
     
     func getSavedStories() -> [Story] {
         let savedStories = dataBaseService.fetchSavedStories()
-        return savedStories
+        return savedStories.sorted { $0.time > $1.time }
     }
     
     func saveStory(_ story: Story) {

@@ -31,12 +31,13 @@ final class JobsViewController: UIViewController {
         ])
     }
     
-    func loadInitialJobs() {
+    private func loadInitialJobs() {
         Task {
             do {
                 let data = try await getStoriesUseCase.getJobs()
                 await MainActor.run {
                     print("jobs loaded")
+                    jobListView.didFinishRefreshing()
                     jobListView.update(with: data)
                 }
             } catch {
@@ -45,7 +46,7 @@ final class JobsViewController: UIViewController {
         }
     }
     
-    func loadMoreJobsIfNeeded() {
+    private func loadMoreJobsIfNeeded() {
         guard !jobListView.isLoading else { return }
         jobListView.showLoadingMore()
         Task {
@@ -65,12 +66,31 @@ final class JobsViewController: UIViewController {
         }
     }
     
+    private func refreshJobs() {
+        Task {
+            do {
+                let data = try await getStoriesUseCase.getJobs(isRefreshing: true)
+                await MainActor.run {
+                    print("jobs loaded")
+                    self.jobListView.didFinishRefreshing()
+                    jobListView.update(with: data)
+                }
+            } catch {
+                print("error, ", error.localizedDescription)
+            }
+        }
+    }
+    
     
 }
 
 
 // MARK: - Table View Delegate
 extension JobsViewController: StoryListViewDelegate {
+    func didRefreshList() {
+        self.refreshJobs()
+    }
+    
     func didSelectStory(_ story: Story) {
         let webVC = WebViewController(story: story)
         navigationController?.pushViewController(webVC, animated: true)

@@ -8,8 +8,8 @@
 import Foundation
 
 protocol GetStoriesUseCaseProtocol {
-    func getStories(type: StoryType) async throws -> [Story]
-    func getJobs() async throws -> [Story]
+    func getStories(type: StoryType, isRefreshing: Bool) async throws -> [Story]
+    func getJobs(isRefreshing: Bool) async throws -> [Story]
     func getSavedStories() -> [Story]
 }
 
@@ -20,19 +20,19 @@ final class GetStoriesUseCase: GetStoriesUseCaseProtocol {
         self.repository = repository
     }
     
-    func getStories(type: StoryType) async throws -> [Story] {
+    func getStories(type: StoryType, isRefreshing: Bool = false) async throws -> [Story] {
         switch type {
         case .latest:
-            let data = try await repository.getRecentStories()
+            let data = try await repository.getRecentStories(isRefreshing: isRefreshing)
             return data
         case .trending:
-            let data = try await repository.getTrendingStories()
+            let data = try await repository.getTrendingStories(isRefreshing: isRefreshing)
             return data
         }
     }
     
-    func getJobs() async throws -> [Story] {
-        let data = try await repository.getJobList()
+    func getJobs(isRefreshing: Bool = false) async throws -> [Story] {
+        let data = try await repository.getJobList(isRefreshing: isRefreshing)
         return data
     }
     

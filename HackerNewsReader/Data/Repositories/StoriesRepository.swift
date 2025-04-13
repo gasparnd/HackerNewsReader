@@ -8,9 +8,9 @@
 import Foundation
 
 protocol StoriesRepository {
-    func getRecentStories() async throws -> [Story]
-    func getTrendingStories() async throws -> [Story]
-    func getJobList() async throws -> [Story]
+    func getRecentStories(isRefreshing: Bool) async throws -> [Story]
+    func getTrendingStories(isRefreshing: Bool) async throws -> [Story]
+    func getJobList(isRefreshing: Bool) async throws -> [Story]
     func getStoryDetails(id: Int) async throws -> Story
     func getSavedStories() -> [Story]
     func saveStory(_ story: Story) -> Void

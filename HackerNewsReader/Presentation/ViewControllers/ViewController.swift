@@ -50,7 +50,7 @@ class ViewController: UIViewController, UITableViewDelegate {
         ])
     }
     
-    func loadInitialStories(type: StoryType) {
+    private func loadInitialStories(type: StoryType) {
         Task {
             do {
                 let data = try await getStoriesUseCase.getStories(type: type)
@@ -64,7 +64,7 @@ class ViewController: UIViewController, UITableViewDelegate {
         }
     }
     
-    func loadMoreStoriesIfNeeded() {
+    private func loadMoreStoriesIfNeeded() {
         guard !storyListView.isLoading else { return }
         storyListView.showLoadingMore()
         Task {
@@ -77,6 +77,25 @@ class ViewController: UIViewController, UITableViewDelegate {
                         return
                     }
                     self.storyListView.update(with: data, isPaginated: true)
+                }
+            } catch {
+                print("error, ", error.localizedDescription)
+            }
+        }
+    }
+    
+    private func refreshStories() {
+        Task {
+            do {
+                let data = try await getStoriesUseCase.getStories(type: selectedFilter, isRefreshing: true)
+                await MainActor.run {
+                    print("data loaded")
+                    if data.count == 0 {
+                        storyListView.showNoMoreData(message: "No more stories")
+                        return
+                    }
+                    self.storyListView.didFinishRefreshing()
+                    self.storyListView.update(with: data)
                 }
             } catch {
                 print("error, ", error.localizedDescription)
@@ -102,6 +121,10 @@ class ViewController: UIViewController, UITableViewDelegate {
 
 // MARK: - Table View Delegate
 extension ViewController: StoryListViewDelegate {
+    func didRefreshList() {
+        self.refreshStories()
+    }
+    
     func didSelectStory(_ story: Story) {
         let webVC = WebViewController(story: story)
         navigationController?.pushViewController(webVC, animated: true)

@@ -11,6 +11,7 @@ import UIKit
 protocol StoryListViewDelegate: AnyObject {
     func didSelectStory(_ story: Story)
     func didRequestNextPage()
+    func didRefreshList()
 }
 
 final class StoryListView: UIView {
@@ -23,6 +24,7 @@ final class StoryListView: UIView {
     private var footerView: LoadingFooterView!
     
     private let tableView = UITableView()
+    private let refreshControl = UIRefreshControl()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -49,6 +51,16 @@ final class StoryListView: UIView {
         tableView.delegate = self
         footerView = LoadingFooterView(frame: CGRect(x: 0, y: 0, width: frame.width, height: 80))
         tableView.tableFooterView = footerView
+        tableView.refreshControl = refreshControl
+        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+    }
+    
+    @objc private func handleRefresh() {
+        delegate?.didRefreshList()
+    }
+    
+    func didFinishRefreshing() {
+        refreshControl.endRefreshing()
     }
     
     func update(with stories: [Story], isPaginated: Bool = false) {

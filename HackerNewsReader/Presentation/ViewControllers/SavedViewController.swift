@@ -19,18 +19,28 @@ final class SavedViewController: UIViewController {
         loadSavedStories()
     }
     
-    func loadSavedStories() {
+    private func loadSavedStories() {
         print("starts")
         Task {
             do {
                 let data = useCases.getSavedStories()
-                print(data)
                 savedStoryList.update(with: data)
             }
         }
     }
     
-    func setupList() {
+    private func refreshSavedStories() {
+        print("starts")
+        Task {
+            do {
+                let data = useCases.getSavedStories()
+                savedStoryList.didFinishRefreshing()
+                savedStoryList.update(with: data)
+            }
+        }
+    }
+    
+    private func setupList() {
         view.addSubview(savedStoryList)
         savedStoryList.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -45,6 +55,10 @@ final class SavedViewController: UIViewController {
 // MARK: - TABLE VIEW DELEGATE
 
 extension SavedViewController: StoryListViewDelegate {
+    func didRefreshList() {
+        self.refreshSavedStories()
+    }
+    
     func didSelectStory(_ story: Story) {
         let webVC = WebViewController(story: story)
         navigationController?.pushViewController(webVC, animated: true)
