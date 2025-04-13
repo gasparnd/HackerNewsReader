@@ -51,7 +51,24 @@ final class DataBaseService: DataBaseServiceProtocol {
         }
     }
     
+    func getStoryById(_ id: Int32) -> Story? {
+        let fetchRequest: NSFetchRequest<StoryEntity> = StoryEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %d", id)
+        do {
+            let result = try context.fetch(fetchRequest)
+            return result.first?.toStory()
+        } catch {
+            print("Error en la búsqueda: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
     func saveStory(story: Story) {
+        let existingStory = getStoryById(story.id)
+        if let _ = existingStory {
+            return
+        }
+        
         let newStory = StoryEntity(context: context)
         newStory.id = story.id
         newStory.title = story.title
